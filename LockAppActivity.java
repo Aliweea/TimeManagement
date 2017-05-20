@@ -26,9 +26,9 @@ public class LockAppActivity extends Activity implements AdapterView.OnItemClick
     private ListView listView;
     private Context context;
     private AppInfoDao infoDao;
-    private List<AppInfo> unLockedDatas;
-    private List<AppInfo> lockedDatas;
-    private List<AppInfo> adapterDatas;
+    private List<String> unLockedDatas;
+    private List<String> lockedDatas;
+    private List<String> adapterDatas;
     private TextView tvTitle;
     private LockAdapter adapter;
     private WatchDogDao watchDogDao;
@@ -38,7 +38,7 @@ public class LockAppActivity extends Activity implements AdapterView.OnItemClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
-        setContentView(R.layout.activity_lock_app);
+        setContentView(R.layout.activity_main);
         Intent intent = new Intent(this, WatchDogService.class);
         startService(intent);
         watchDogDao = new WatchDogDao(context);
@@ -51,7 +51,7 @@ public class LockAppActivity extends Activity implements AdapterView.OnItemClick
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvTitle.setText("未加锁");
         adapterDatas = unLockedDatas;
-        tvTitle.setOnClickListener(new View.OnClickListener() {
+        tvTitle.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -72,16 +72,10 @@ public class LockAppActivity extends Activity implements AdapterView.OnItemClick
     private void updateData() {
         infoDao = new AppInfoDao();
         unLockedDatas = infoDao.getAllApps(context);
-
-        for(int i=0; i<lockedDatas.size(); i++){
-            if(watchDogDao.query(lockedDatas.get(i).packageName)){
-                lockedDatas.remove(i);
-            }
-        }
-
-        for (AppInfo app : lockedDatas) {
-            if (unLockedDatas.contains(app))
-                unLockedDatas.remove(app);
+        lockedDatas = watchDogDao.queryAllInfos();
+        for (String text : lockedDatas) {
+            if (unLockedDatas.contains(text))
+                unLockedDatas.remove(text);
         }
     }
 
@@ -117,26 +111,27 @@ public class LockAppActivity extends Activity implements AdapterView.OnItemClick
             TextView textView = (TextView) convertView;
             textView.setPadding(8, 8, 8, 8);
             textView.setTextSize(18);
-            textView.setText(adapterDatas.get(position).packageName);   //要改
+            textView.setText(adapterDatas.get(position));
             return textView;
         }
 
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position,
+            long id) {
         System.out.println("position： " + position);
         System.out.println("id： " + id);
         vtoast("position： " + position + "\n id： " + id);
         if (tvTitle.getText().toString().equals("未加锁")) {
-            AppInfo removedPackage = unLockedDatas.remove(position);
-            watchDogDao.insert(removedPackage.packageName);
-            lockedDatas.add(removedPackage);
+            String removedPackageName = unLockedDatas.remove(position);
+            watchDogDao.insert(removedPackageName);
+            lockedDatas.add(removedPackageName);
             adapter.notifyDataSetInvalidated();
         } else {
-            AppInfo removedPackage = lockedDatas.remove(position);
-            watchDogDao.delete(removedPackage.packageName);
-            unLockedDatas.add(removedPackage);
+            String removedPackageName = lockedDatas.remove(position);
+            watchDogDao.delete(removedPackageName);
+            unLockedDatas.add(removedPackageName);
             adapter.notifyDataSetInvalidated();
         }
 
