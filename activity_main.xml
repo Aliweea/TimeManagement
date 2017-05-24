@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mycompany.test.MainActivity">
+
+    <TextView
+        android:gravity="center_horizontal"
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:background="@android:color/darker_gray"
+        android:clickable="true"
+        android:padding="8dp"
+        android:text="未加锁"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+
+    <ListView
+        android:id="@+id/lockListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitle" >
+    </ListView>
+
+</RelativeLayout>
